@@ -1,0 +1,60 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+    background-color: grey;
+    font-family: Roboto, Helvetica, 'Open Sans', sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(32, 32, 32);
+}
+
+#screen {
+    padding: 20px;
+    width: 500px;
+}
+
+#buttons {
+    display: flex;
+    width: 500px;
+    flex-wrap: wrap;
+    justify-content: center;
+    border: solid 3px black;
+    padding: 25px;
+}
+
+button {
+    padding: 0px;
+    margin: 1px;
+    height: 60px;
+    width: 90px;
+    border: 0px;
+    border-radius: 5px;
+    background-color: rgb(65, 65, 65);
+    color: white;
+    font-size: large;
+    font-weight: bolder;
+}
+
+.compute {
+    background-color: green;
+}
+
+.operand {
+    background-color: rgb(189, 189, 70);
+}
+
+.edit {
+    background-color: rgb(45, 45, 45);
+}
+
+.number:hover {background-color: rgb(45, 45, 45);}
+.edit:hover {background-color: rgb(65, 65, 65);}
+.operand:hover {background-color: rgb(85, 85, 24);}
+.compute:hover {background-color: rgb(0, 90, 0);}
