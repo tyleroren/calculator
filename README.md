@@ -1,1 +1,1 @@
-# calculator
+Calculator in javascript for the Odin Project
