@@ -73,10 +73,11 @@ button {
     font-weight: bold;
 }
 
-.compute {background-color: green;}
-.operand {background-color: rgb(189, 189, 70);}
-.edit {background-color: rgb(45, 45, 45);}
-.number:hover {background-color: rgb(45, 45, 45);}
-.edit:hover {background-color: rgb(65, 65, 65);}
-.operand:hover {background-color: rgb(85, 85, 24);}
-.compute:hover {background-color: rgb(0, 90, 0);}
+#buttons button:active {background-color: rgb(20, 20, 20)}
+.number:hover {background-color: rgb(45, 45, 45)}
+.edit {background-color: rgb(45, 45, 45)}
+.edit:hover {background-color: rgb(65, 65, 65)}
+.operand {background-color: rgb(189, 189, 70)}
+.operand:hover {background-color: rgb(85, 85, 24)}
+.compute {background-color: green}
+.compute:hover {background-color: rgb(0, 90, 0)}
