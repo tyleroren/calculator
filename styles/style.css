@@ -73,6 +73,11 @@ button {
     font-weight: bold;
 }
 
+.weakness {
+    background-color: black;
+    color: green;
+}
+
 #buttons button:active {background-color: rgb(20, 20, 20)}
 .number:hover {background-color: rgb(45, 45, 45)}
 .edit {background-color: rgb(45, 45, 45)}
