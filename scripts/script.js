@@ -15,7 +15,7 @@ function calculate(a, b, op) {
         case "-":
             return a - b;
             break;
-        case "x":
+        case "*":
             return a * b;
             break;
         case "/":
@@ -27,66 +27,62 @@ function calculate(a, b, op) {
     }
 }
 
-function appendDisplay(e) {
-    // adds the clicked number to the end of the display, stores new value as a mathable variable 
-    // checks to see if input is key or mouse, which changes how the text is added
-    if (clearText == 1) {displayElement.textContent = ""};
-    if (e.key) {
-        displayElement.textContent += e.key;
-    } else {
-        displayElement.textContent += e.target.value;
+function appendDisplay(origin, inputTxt) {
+    if (clearText) {displayElement.textContent = ""};
+    // updates display depending on the origin of the function call
+    switch (origin) {
+        case "mouseclick":
+        case "keypress":
+            // number buttons just add to the end of the display
+            displayElement.textContent += inputTxt;
+            break;
+        case "opNew":
+            // new operands move the display to the history and add the operator
+            historyElement.textContent = `${displayNumber} ${inputTxt} `;
+            displayElement.textContent = "";
+            break;
+        case "opExists":
+            // next operands calculate the current expression and add the new operator
+            displayElement.textContent = calculate(userA, userB, userOp);
+            historyElement.textContent = `${displayElement.textContent} ${inputTxt} `;
+            break;
+        case "opEmpty":
+            // clicking operator while the display is empty just changes the history
+            historyElement.textContent = `${userA} ${inputTxt} `;
+            break;
+        default:
+            displayElement.textContent = "error";
     }
     displayNumber = Number(displayElement.textContent);
     clearText = 0;
 }
 
-function clickOperand(e) {
-    let inputTxt = 0;
-    let inputOp = 0;
-    // splitting up mouse vs key, sets vars depending on what is used
-    if (e.key) {
-        if (e.key === "*") {
-            inputTxt = "x";
-        } else if (e.key === "/") {
-            inputTxt = "&divide;";
-        } else {
-        inputTxt = e.key;
-        }
-        inputOp = e.key;
+function clickOperand(inputVal, inputTxt) {
+    if (inputTxt === "*") inputTxt = "x";
+    if (inputTxt === "/") inputTxt = "&divide;";
+    if (userOp === null) {
+        // if no operand has been selected yet, then sends the clicked operand to appendDisplay
+        userA = displayNumber;
+        appendDisplay("opNew", inputTxt);
+    } else if (userOp !== null && displayElement.textContent !== "" && !clearText) {
+        // if operand has already been chosen, then sends the numbers to be calculated and the new operand to be updated
+        userB = displayNumber;
+        appendDisplay("opExists", inputTxt);
+        userA = displayNumber;
     } else {
-        inputTxt = e.target.textContent;
-        inputOp = e.target.value;
+        // if there's an existing operand but empty display, then sends new operand to update in the history line
+        appendDisplay("opEmpty", inputTxt);
     }
-    if (userOp !== null && displayElement.textContent !== "" && displayNumber !== "") {
-        // performs the calculation if there is already an existing equation
-        // Updates the display and history with calculation outcome
-        displayElement.textContent = calculate(userA, displayNumber, userOp);
-        historyElement.textContent = `${displayElement.textContent} ${inputTxt} `;
-        displayNumber = Number(displayElement.textContent);
-    } else if (userOp === null) {
-        // moves the displayed number to the history line and adds the operand to the end
-        displayNumber = Number(displayElement.textContent);
-        historyElement.textContent = `${displayNumber} ${inputTxt} `;
-        displayElement.textContent = "";
-    } else {
-        // if there's a new operand but nothing typed in yet it just updates the history variable
-        displayNumber = userA;
-        historyElement.textContent = `${displayNumber} ${inputTxt} `;
-    }
-    // updates the operand with the one that was just clicked
-    // updates the user variable with the newly displayed number
-    userOp = inputOp;
+    // updates global operand variable with the value of clicked operand
+    userOp = inputVal;
     clearText = 1;
-    userA = displayNumber;
-    displayNumber = "";
 }
 
 function clickEquals() {
-    if (clearText === 1) {
-        return;
-    }
+    if (clearText || !userOp) {return};
     if (!historyElement.textContent.includes('=')) {historyElement.textContent += `${displayNumber} = `};
     displayElement.textContent = calculate(userA, displayNumber, userOp);
+    userA = displayElement.textContent;
     clearText = 1;
 }
 
@@ -98,19 +94,25 @@ function clickClear() {
     displayNumber = 0;
 }
 
-numShortcuts = ['.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-opShortcuts = ['+', '-', '*', '/'];
-
-document.querySelectorAll('.number').forEach((item) => item.addEventListener('click', appendDisplay));
+// button listeners, calls the corresponding function and passes event data through
+document.querySelectorAll('.number').forEach((item) => item.addEventListener('click', (e) => {
+    appendDisplay("mouseclick", e.target.textContent);
+}));
+document.querySelectorAll('.operand').forEach((item) => item.addEventListener('click', (e) => {
+    clickOperand(e.target.value, e.target.textContent);
+}));
 document.querySelector('.clear').addEventListener('click', clickClear);
-document.querySelectorAll('.operand').forEach((item) => item.addEventListener('click', clickOperand));
 document.querySelector('.compute').addEventListener('click', clickEquals);
 
+// keyboard shortcut listeners, calls the same functions as above
+// depending on which key is pressed, passes event data through
 document.addEventListener('keydown', (e) => {
+    const numShortcuts = ['.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const opShortcuts = ['+', '-', '*', '/'];
     if (numShortcuts.includes(e.key)) {
-        appendDisplay(e);
+        appendDisplay("keypress", e.key);
     } else if (opShortcuts.includes(e.key)) {
-        clickOperand(e);
+        clickOperand(e.key, e.key);
     } else if (e.key === "Enter") {
         e.preventDefault();
         clickEquals();
