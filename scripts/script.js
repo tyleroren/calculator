@@ -45,7 +45,13 @@ function clickOperand(e) {
     let inputOp = 0;
     // splitting up mouse vs key, sets vars depending on what is used
     if (e.key) {
+        if (e.key === "*") {
+            inputTxt = "x";
+        } else if (e.key === "/") {
+            inputTxt = "&divide;";
+        } else {
         inputTxt = e.key;
+        }
         inputOp = e.key;
     } else {
         inputTxt = e.target.textContent;
@@ -63,8 +69,9 @@ function clickOperand(e) {
         historyElement.textContent = `${displayNumber} ${inputTxt} `;
         displayElement.textContent = "";
     } else {
-        historyElement.textContent = "";
-        displayElement.textContent = "error";
+        // if there's a new operand but nothing typed in yet it just updates the history variable
+        displayNumber = userA;
+        historyElement.textContent = `${displayNumber} ${inputTxt} `;
     }
     // updates the operand with the one that was just clicked
     // updates the user variable with the newly displayed number
@@ -75,7 +82,10 @@ function clickOperand(e) {
 }
 
 function clickEquals() {
-    if (historyElement.textContent.includes('=')) {historyElement.textContent += `${displayNumber} = `};
+    if (clearText === 1) {
+        return;
+    }
+    if (!historyElement.textContent.includes('=')) {historyElement.textContent += `${displayNumber} = `};
     displayElement.textContent = calculate(userA, displayNumber, userOp);
     clearText = 1;
 }
@@ -96,13 +106,13 @@ document.querySelector('.clear').addEventListener('click', clickClear);
 document.querySelectorAll('.operand').forEach((item) => item.addEventListener('click', clickOperand));
 document.querySelector('.compute').addEventListener('click', clickEquals);
 
-document.addEventListener('keyup', (e) => {
-    console.log(e);
+document.addEventListener('keydown', (e) => {
     if (numShortcuts.includes(e.key)) {
         appendDisplay(e);
     } else if (opShortcuts.includes(e.key)) {
         clickOperand(e);
     } else if (e.key === "Enter") {
-        clickEquals(e);
+        e.preventDefault();
+        clickEquals();
     }
-});
+}, true);
