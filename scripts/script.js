@@ -31,6 +31,8 @@ function calculate(a, b, op) {
 function updateDisplay(origin, inputTxt) {
     // clearText is a flag variable. 0 = do nothing, 1 = clear display div, 2 = reset calc
     // updates display depending on the origin of the function call
+    displayElement.textContent = Number(displayElement.textContent.replaceAll(",", "")).toLocaleString().replaceAll(",", "");
+    
     switch (origin) {
         case "mouseclick":
         case "keypress":
@@ -61,8 +63,12 @@ function updateDisplay(origin, inputTxt) {
             displayElement.textContent = "error";
     }
     displayNumber = Number(displayElement.textContent);
+    displayElement.textContent = displayNumber.toLocaleString();
     clearText = 0;
-    updateVars();
+
+    if (displayElement.textContent.length > 14) {
+        displayElement.textContent = Number(displayElement.textContent.replaceAll(",", "")).toExponential(8);
+    }
 }
 
 function clickOperand(inputVal, inputTxt) {
@@ -72,20 +78,19 @@ function clickOperand(inputVal, inputTxt) {
         userA = displayNumber;
         updateDisplay("opNew", inputTxt);
     } else if (userOp !== null && displayNumber !== 0 && !clearText) {
-        // if operand has already been chosen, then sends the numbers to be calculated and the new operand to be updated
+        // if operand has already been chosen, this sends the numbers to be calculated and the new operand to be updated
         updateDisplay("opExists", inputTxt);
         userA = displayNumber;
     } else if (clearText) {
-        // if there's an existing operand but empty display, then sends new operand to update in the history line
+        // if there's an existing operand but empty display, this sends the new operand to update history line
         updateDisplay("opEmpty", inputTxt);
     } else {
         return;
     }
-    // updates global operand variable with the value of clicked operand
+    // updates global operand variable with the new clicked value
     userOp = inputVal;
     displayOp = inputTxt;
     clearText = 1;
-    updateVars();
 }
 
 function clickEquals() {
@@ -93,7 +98,6 @@ function clickEquals() {
     updateDisplay("equals", displayOp);
     userA = displayNumber;
     clearText = 2;
-    updateVars();
 }
 
 function clickClear() {
@@ -103,15 +107,6 @@ function clickClear() {
     userA = 0;
     userB = 0;
     displayNumber = 0;
-    updateVars();
-}
-
-function updateVars() {
-    document.querySelector('.displayNumber').textContent = displayNumber;
-    document.querySelector('.userA').textContent = userA;
-    document.querySelector('.userB').textContent = userB;
-    document.querySelector('.userOp').textContent = userOp;
-    document.querySelector('.clearText').textContent = clearText;
 }
 
 // button listeners, calls the corresponding function and passes event data through

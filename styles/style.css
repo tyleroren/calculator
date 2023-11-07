@@ -7,7 +7,7 @@
 html,
 body {
     background-color: grey;
-    font-family: Roboto, Helvetica, 'Open Sans', sans-serif;
+    font-family: 'Courier New', Courier, monospace;
     height: 100%;
 }
 
@@ -71,11 +71,6 @@ button {
     color: white;
     font-size: 26px;
     font-weight: bold;
-}
-
-.weakness {
-    background-color: black;
-    color: green;
 }
 
 #buttons button:active {background-color: rgb(20, 20, 20)}
