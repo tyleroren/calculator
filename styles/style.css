@@ -9,6 +9,7 @@ body {
     background-color: grey;
     font-family: 'Courier New', Courier, monospace;
     height: 100%;
+    /* display: flex; */
 }
 
 .container {
@@ -76,7 +77,7 @@ button {
 .debug {
     background-color: black;
     color: green;
-    width: 350px;
+    width: 550px;
     height: 350px;
 }
 

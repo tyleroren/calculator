@@ -51,17 +51,14 @@ function clickClear() {
 }
 
 function convertExponential(num) {
-    // displayNumber's length in SciNote is passed to this function and compared to max length of the display screen
+    // number that's passed to this function is converted and the length compared to max display size
     // any excess length is removed from the max length of the scientific notation
     let length = num.toLocaleString('en-US', {notation: 'scientific', maximumFractionDigits: 11}).length
     let over = ((length - 15) > 0) ? (length - 15) : 0;
-    return displayNumber.toLocaleString('en-US', {notation: 'scientific', maximumFractionDigits: 11-over});
+    return num.toLocaleString('en-US', {notation: 'scientific', maximumFractionDigits: 11-over});
 }
 
 function updateDisplay(origin, inputTxt) {
-    // puts the unformatted number back on the screen for manipulating in switch
-    // checks history numbers sizes
-    // displayElement.textContent = displayNumber;
     const historyA = (userA.toString().length > 12) ? convertExponential(userA) : userA;
     const historyB = (userB.toString().length > 12) ? convertExponential(userB) : userB;
     // clearText is a flag variable. 0 = do nothing, 1 = clear display div, 2 = reset calc
@@ -73,12 +70,8 @@ function updateDisplay(origin, inputTxt) {
             if (clearText) {displayElement.textContent = ""};
             displayElement.textContent = displayNumber;
             break;
-        case "opNew":
-            // new operands move the display to the history and add the operator
-            historyElement.textContent = `${historyA} ${inputTxt} `;
-            break;
         case "opEmpty":
-            // clicking operator while the display is empty just changes the history
+            // new operators and operators while display is empty simply update the operator on the history
             historyElement.textContent = `${historyA} ${inputTxt} `;
             break;
         case "opExists":
@@ -87,6 +80,7 @@ function updateDisplay(origin, inputTxt) {
             historyElement.textContent = `${historyA} ${inputTxt} `;
             break;
         case "equals":
+            // equal sign shows entire equation with the solution in the display
             historyElement.textContent = `${historyA} ${displayOp} ${historyB} = `;
             displayElement.textContent = displayNumber;
             break;
@@ -98,25 +92,25 @@ function updateDisplay(origin, inputTxt) {
     if (displayElement.textContent.length > 15) {
         displayElement.textContent = convertExponential(displayNumber);
     }
+    // test(historyA, historyB);
 }
 
 function clickButton(origin, inputVal, inputTxt) {
     switch (origin) {
         case "mouseclick":
         case "keypress":
+            if (clearText === 2) clickClear();
             displayStr += inputTxt; // updates display variable with new number clicked
             displayNumber = BigInt(displayStr);
             if (!userOp) { // updates user variable depending on if an operand is clicked yet
-                userA = BigInt(displayNumber);
+                userA = displayNumber;
             } else {
-                userB = BigInt(displayNumber);
+                userB = displayNumber;
             }
             clearText = 0;
             break;
         case "op":
-            if (userOp === null) {
-                origin = "opNew";
-            } else if (clearText && userOp) {
+            if (userOp === null || (clearText && userOp)) {
                 origin = "opEmpty";
                 if (clearText === 2) (userA = displayNumber);
             } else if (!clearText && userOp) {
@@ -138,6 +132,7 @@ function clickButton(origin, inputVal, inputTxt) {
             if (clearText === 2) userA = displayNumber;
             displayNumber = calculate(userA, userB, userOp);
             clearText = 2;
+            displayStr = "";
             break;
         default:
             origin = "error"
