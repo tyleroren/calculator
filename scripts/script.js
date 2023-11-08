@@ -161,9 +161,10 @@ document.addEventListener('keydown', (e) => {
     const numShortcuts = ['.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     const opShortcuts = ['+', '-', '*', '/'];
     if (numShortcuts.includes(e.key)) {
+        e.preventDefault();
         clickButton("keypress", e.key, e.key);
-
     } else if (opShortcuts.includes(e.key)) {
+        e.preventDefault();
         document.querySelector(`[value=${CSS.escape(e.key)}]`).click();
     } else if (e.key === "Enter") {
         e.preventDefault();
