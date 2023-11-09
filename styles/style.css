@@ -9,7 +9,6 @@ body {
     background-color: grey;
     font-family: 'Courier New', Courier, monospace;
     height: 100%;
-    display: flex;
 }
 
 .container {
@@ -72,13 +71,6 @@ button {
     color: white;
     font-size: 26px;
     font-weight: bold;
-}
-
-.debug {
-    background-color: black;
-    color: green;
-    width: 550px;
-    height: 350px;
 }
 
 #buttons button:active {background-color: rgb(20, 20, 20)}

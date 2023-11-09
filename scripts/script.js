@@ -9,17 +9,6 @@ let displayStr = "";
 let displayOp = null;
 
 
-function test(a, b) {
-    document.querySelector('.userA').textContent = userA + " " + typeof userA;
-    document.querySelector('.historyA').textContent = a + " " + typeof a;
-    document.querySelector('.userB').textContent = userB + " " + typeof userB;
-    document.querySelector('.historyB').textContent = b + " " + typeof b;
-    document.querySelector('.displayNumber').textContent = displayNumber + " " + typeof displayNumber;
-    document.querySelector('.userOp').textContent = userOp + " " + typeof userOp;
-    document.querySelector('.clearText').textContent = clearText;
-    document.querySelector('.displayStr').textContent = displayStr + " " + typeof displayStr;
-}
-
 function calculate(a, b, op) {
     switch (op) {
         case "+":
@@ -40,77 +29,21 @@ function calculate(a, b, op) {
     }
 }
 
-function clickClear() {
-    displayElement.textContent = "0";
-    historyElement.textContent = "";
-    userOp = null;
-    userA = 0;
-    userB = 0;
-    displayNumber = 0;
-    displayStr = "";
-}
-
-function convertExponential(num) {
-    // number that's passed to this function is converted and the length compared to max display size
-    // any excess length is removed from the max length of the scientific notation
-    let length = num.toLocaleString('en-US', {notation: 'scientific', maximumFractionDigits: 11}).length
-    let over = ((length - 15) > 0) ? (length - 15) : 0;
-    return num.toLocaleString('en-US', {notation: 'scientific', maximumFractionDigits: 11-over});
-}
-
-function negative(num) {
-    if (num > 0) {
-        return -Math.abs(num);
-    } else if (num < 0) {
-        return Math.abs(num);
-    } else {
-        updateDisplay("error");
-    }
-}
-
-function updateDisplay(origin, inputTxt) {
-    const historyA = (userA.toString().length > 12) ? convertExponential(userA) : userA;
-    const historyB = (userB.toString().length > 12) ? convertExponential(userB) : userB;
-    // clearText is a flag variable. 0 = do nothing, 1 = clear display div, 2 = reset calc
-    // updates display depending on the origin of the function call
-    switch (origin) {
-        case "mouseclick":
-        case "keypress":
-            if (clearText === 2) {clickClear()};
-            if (clearText) {displayElement.textContent = ""};
-            displayElement.textContent = displayNumber;
-            break;
-        case "opExists":
-            // multiple operands calculate the current expression and add the new operator
-            displayElement.textContent = historyA;
-        case "opEmpty":
-            // new operators and operators while display is empty simply update the operator on the history
-            historyElement.textContent = `${historyA} ${inputTxt} `;
-            break;
-        case "equals":
-            // equal sign shows entire equation with the solution in the display
-            historyElement.textContent = `${historyA} ${displayOp} ${historyB} = `;
-            displayElement.textContent = displayNumber;
-            break;
-        case "overflow":
-            historyElement.textContent = "";
-            displayElement.textContent = "OVERFLOW";
-            return;
-            break;
-        default:
-            displayElement.textContent = "error";
-    }
-    // after everything is resolved, checks to see if it fits on calculator screen
-    if (displayElement.textContent.length > 15) {
-        displayElement.textContent = convertExponential(displayNumber);
-    } else {
-        displayElement.textContent = displayNumber.toLocaleString('en-US', {maximumFractionDigits: 15});
-    }
-    test(historyA, historyB);
-}
-
 function clickButton(origin, inputVal, inputTxt) {
     switch (origin) {
+        case "backspace":
+            if (clearText === 2) {
+                clickClear();
+            } else {
+                displayNumber = 0;
+                displayStr = "";
+                if (!userOp) {
+                    userA = 0;
+                } else {
+                    userB = 0;
+                }
+            }
+            break;
         case "negative":
             if (displayNumber === 0) {
                 return;
@@ -177,6 +110,79 @@ function clickButton(origin, inputVal, inputTxt) {
     // after button clicking is resolved and variables are set, sends data to update the display screen
     updateDisplay(origin, inputTxt);
 }
+
+function updateDisplay(origin, inputTxt) {
+    const historyA = (userA.toString().length > 12) ? convertExponential(userA) : userA;
+    const historyB = (userB.toString().length > 12) ? convertExponential(userB) : userB;
+    // clearText is a flag variable. 0 = do nothing, 1 = clear display div, 2 = reset calc
+    // updates display depending on the origin of the function call
+    switch (origin) {
+        case "mouseclick":
+        case "keypress":
+            if (clearText === 2) {clickClear()};
+            if (clearText) {displayElement.textContent = ""};
+            displayElement.textContent = displayNumber;
+            break;
+        case "opExists":
+            // multiple operands calculate the current expression and add the new operator
+            displayElement.textContent = historyA;
+        case "opEmpty":
+            // new operators and operators while display is empty simply update the operator on the history
+            historyElement.textContent = `${historyA} ${inputTxt} `;
+            break;
+        case "equals":
+            // equal sign shows entire equation with the solution in the display
+            historyElement.textContent = `${historyA} ${displayOp} ${historyB} = `;
+            displayElement.textContent = displayNumber;
+            break;
+        case "overflow":
+            historyElement.textContent = "";
+            displayElement.textContent = "OVERFLOW";
+            return;
+            break;
+        case "backspace":
+            displayElement.textContent = "0";
+            break;
+        default:
+            displayElement.textContent = "error";
+    }
+    // after everything is resolved, checks to see if it fits on calculator screen
+    if (displayElement.textContent.length > 12) {
+        displayElement.textContent = convertExponential(displayNumber);
+    } else {
+        displayElement.textContent = displayNumber.toLocaleString('en-US', {maximumFractionDigits: 15});
+    }
+}
+
+function clickClear() {
+    displayElement.textContent = "0";
+    historyElement.textContent = "";
+    userOp = null;
+    userA = 0;
+    userB = 0;
+    displayNumber = 0;
+    displayStr = "";
+    clearText = 1;
+}
+
+function convertExponential(num) {
+    // number that's passed to this function is converted and the length compared to max display size
+    // any excess length is removed from the max length of the scientific notation
+    let length = num.toLocaleString('en-US', {notation: 'scientific', maximumFractionDigits: 11}).length
+    let over = ((length - 15) > 0) ? (length - 15) : 0;
+    return num.toLocaleString('en-US', {notation: 'scientific', maximumFractionDigits: 11-over});
+}
+
+function negative(num) {
+    if (num > 0) {
+        return -Math.abs(num);
+    } else if (num < 0) {
+        return Math.abs(num);
+    } else {
+        updateDisplay("error");
+    }
+}
+
 
 // button listeners, calls the corresponding function and passes event data through
 document.querySelectorAll('.number').forEach((item) => item.addEventListener('click', (e) => {
