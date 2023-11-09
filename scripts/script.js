@@ -80,13 +80,11 @@ function updateDisplay(origin, inputTxt) {
             if (clearText) {displayElement.textContent = ""};
             displayElement.textContent = displayNumber;
             break;
-        case "opEmpty":
-            // new operators and operators while display is empty simply update the operator on the history
-            historyElement.textContent = `${historyA} ${inputTxt} `;
-            break;
         case "opExists":
             // multiple operands calculate the current expression and add the new operator
             displayElement.textContent = historyA;
+        case "opEmpty":
+            // new operators and operators while display is empty simply update the operator on the history
             historyElement.textContent = `${historyA} ${inputTxt} `;
             break;
         case "equals":
