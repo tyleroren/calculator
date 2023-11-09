@@ -12,10 +12,10 @@
         <div id="calc">
             <div id="screen">
                 <p id="history"></p>
-                <p id="display"></p>
+                <p id="display">0</p>
             </div>
             <div id="buttons">
-                <button value="delete" class="edit">&xlarr;</button>
+                <button value="delete" class="edit backspace">&xlarr;</button>
                 <button value="clear" class="edit clear">AC</button>
                 <button value="%" class="edit">%</button>
                 <button value="/" class="operand">&divide;</button>
@@ -31,14 +31,14 @@
                 <button value="2" class="number">2</button>
                 <button value="3" class="number">3</button>
                 <button value="+" class="operand">+</button>
-                <button value="negative" class="edit">+/-</button>
+                <button value="negative" class="edit negative">+/-</button>
                 <button value="0" class="number">0</button>
                 <button value="." class="number edit">.</button>
                 <button value="=" class="compute">=</button>
             </div>
         </div>
     </div>
-<!--     <div class="debug">
+    <div class="debug">
         <p>userA: <span class="userA"></span></p>
         <p>historyA: <span class="historyA"></span></p>
         <p>userB: <span class="userB"></span></p>
@@ -47,6 +47,6 @@
         <p>displayNumber: <span class="displayNumber"></span></p>
         <p>displayStr: <span class="displayStr"></span></p>
         <p>clearText: <span class="clearText"></span></p>
-    </div> -->
+    </div>
 </body>
 </html>

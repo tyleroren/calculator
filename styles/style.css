@@ -9,7 +9,7 @@ body {
     background-color: grey;
     font-family: 'Courier New', Courier, monospace;
     height: 100%;
-    /* display: flex; */
+    display: flex;
 }
 
 .container {
