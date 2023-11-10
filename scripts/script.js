@@ -2,12 +2,21 @@ let userA = 0;
 let userB = 0;
 let userOp = null;
 let clearText = 1;
-const displayElement = document.querySelector('#display');
-const historyElement = document.querySelector('#history');
 let displayNumber = 0;
 let displayStr = "";
 let displayOp = null;
 
+
+function test(a, b) {
+    document.querySelector('.userA').textContent = userA + " " + typeof userA;
+    document.querySelector('.historyA').textContent = a + " " + typeof a;
+    document.querySelector('.userB').textContent = userB + " " + typeof userB;
+    document.querySelector('.historyB').textContent = b + " " + typeof b;
+    document.querySelector('.displayNumber').textContent = displayNumber + " " + typeof displayNumber;
+    document.querySelector('.userOp').textContent = userOp + " " + typeof userOp;
+    document.querySelector('.clearText').textContent = clearText;
+    document.querySelector('.displayStr').textContent = displayStr + " " + typeof displayStr;
+}
 
 function calculate(a, b, op) {
     switch (op) {
@@ -31,31 +40,6 @@ function calculate(a, b, op) {
 
 function clickButton(origin, inputVal, inputTxt) {
     switch (origin) {
-        case "backspace":
-            if (clearText === 2) {
-                clickClear();
-            } else {
-                displayNumber = 0;
-                displayStr = "";
-                if (!userOp) {
-                    userA = 0;
-                } else {
-                    userB = 0;
-                }
-            }
-            break;
-        case "negative":
-            if (displayNumber === 0) {
-                return;
-            } else {
-                displayNumber = negative(displayNumber);
-            }
-            if (!userOp) { // updates user variable depending on if an operand is clicked yet
-                userA = displayNumber;
-            } else {
-                userB = displayNumber;
-            }
-            break;
         case "mouseclick":
         case "keypress": // mouseclick or keypress on a number button
             if (inputTxt === "." && (displayStr.includes('.') || typeof displayNumber == "bigint")) inputTxt = ""; // only lets you put one decimal
@@ -92,6 +76,31 @@ function clickButton(origin, inputVal, inputTxt) {
             clearText = 1;
             displayStr = "";
             break;
+        case "backspace":
+            if (clearText === 2) {
+                clickClear();
+            } else {
+                displayNumber -= displayNumber;
+                displayStr = "";
+                if (!userOp) {
+                    userA = 0;
+                } else {
+                    userB = 0;
+                }
+            }
+            break;
+        case "negative":
+            if (displayNumber === 0) {
+                return;
+            } else {
+                displayNumber = negative(displayNumber);
+            }
+            if (!userOp) { // updates user variable depending on if an operand is clicked yet
+                userA = displayNumber;
+            } else {
+                userB = displayNumber;
+            }
+            break;
         case "equals":
             if (!userOp) {return};
             if (clearText === 1) userB = displayNumber;
@@ -112,6 +121,8 @@ function clickButton(origin, inputVal, inputTxt) {
 }
 
 function updateDisplay(origin, inputTxt) {
+    const displayElement = document.querySelector('#display');
+    const historyElement = document.querySelector('#history');
     const historyA = (userA.toString().length > 12) ? convertExponential(userA) : userA;
     const historyB = (userB.toString().length > 12) ? convertExponential(userB) : userB;
     // clearText is a flag variable. 0 = do nothing, 1 = clear display div, 2 = reset calc
@@ -140,29 +151,32 @@ function updateDisplay(origin, inputTxt) {
             displayElement.textContent = "OVERFLOW";
             return;
             break;
+        case "clear":
+            historyElement.textContent = "";
         case "backspace":
             displayElement.textContent = "0";
             break;
         default:
             displayElement.textContent = "error";
     }
+    displayElement.textContent = displayNumber.toLocaleString('en-US', {maximumFractionDigits: 15});
     // after everything is resolved, checks to see if it fits on calculator screen
-    if (displayElement.textContent.length > 12) {
+    if (displayElement.textContent.length > 15) {
         displayElement.textContent = convertExponential(displayNumber);
     } else {
-        displayElement.textContent = displayNumber.toLocaleString('en-US', {maximumFractionDigits: 15});
+        
     }
+test(historyA, historyB);
 }
 
 function clickClear() {
-    displayElement.textContent = "0";
-    historyElement.textContent = "";
     userOp = null;
     userA = 0;
     userB = 0;
     displayNumber = 0;
     displayStr = "";
     clearText = 1;
+    updateDisplay("clear");
 }
 
 function convertExponential(num) {

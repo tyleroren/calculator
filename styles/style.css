@@ -15,7 +15,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    /* height: 100%; */
 }
 
 #calc {
@@ -71,6 +71,23 @@ button {
     color: white;
     font-size: 26px;
     font-weight: bold;
+}
+
+.now {
+    font-weight: bolder;
+    font-size: 30px;
+    text-align: center;
+}
+
+.debug {
+    background-color: black;
+    color: green;
+    width: 1000px;
+    height: 350px;
+}
+
+span {
+    color: white;
 }
 
 #buttons button:active {background-color: rgb(20, 20, 20)}
