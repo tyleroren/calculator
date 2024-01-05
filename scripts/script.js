@@ -1,58 +1,22 @@
-let userA = 0;
-let userB = 0;
+let userA = "0";
+let userB = "0";
 let userOp = null;
 let clearText = 1;
 let displayNumber = "0";
 let displayOp = null;
 
-
-function test(a, b) {
-    document.querySelector('.userA').textContent = userA + " " + typeof userA;
-    document.querySelector('.historyA').textContent = a + " " + typeof a;
-    document.querySelector('.userB').textContent = userB + " " + typeof userB;
-    document.querySelector('.historyB').textContent = b + " " + typeof b;
-    document.querySelector('.displayNumber').textContent = displayNumber + " " + typeof displayNumber;
-    document.querySelector('.converted').textContent = Number(displayNumber).toLocaleString('en-US', {maximumFractionDigits: 20});
-    document.querySelector('.length').textContent = Number(displayNumber).toLocaleString('en-US', {maximumFractionDigits: 20}).length;
-    document.querySelector('.userOp').textContent = userOp + " " + typeof userOp;
-    document.querySelector('.clearText').textContent = clearText;
-}
-
 function calculate(a, b, op) {
-    let result = 0;
-    if (Number(a) >= Number.MAX_SAFE_INTEGER || Number(b) >= Number.MAX_SAFE_INTEGER) {
-        a = BigInt(Math.round(a));
-        b = BigInt(Math.round(b));
-    } else {
-        a = Number(a);
-        b = Number(b);
-    }
     switch (op) {
         case "+":
-            result = (a + b);
-            break;
+            return (a + b);
         case "-":
-            result = (a - b);
-            break;
+            return (a - b);
         case "*":
-            result = (a * b);
-            break;
+            return (a * b);
         case "/":
-            result = (a / b);
-            break;
+            return (a / b);
         default:
             return "oops";
-    }
-    // size check
-    if (typeof result === "bigint" || result > 999999999999999) {
-        return convertExponential(result);
-    } else if (typeof result === "number") {
-        round(result, 16);
-        if (lengthCheck(result)) {
-            updateDisplay("error");
-        } else {
-            return result.toString();
-        }
     }
 }
 
@@ -60,6 +24,7 @@ function clickButton(origin, inputVal, inputTxt) {
     switch (origin) {
         case "mouseclick":
         case "keypress": // mouseclick or keypress on a number button
+            if (!lengthCheck(displayNumber)) return;
             if (inputTxt === "." && (displayNumber.includes('.') || typeof displayNumber == "bigint")) inputTxt = ""; // only lets you put one decimal
             if (clearText === 2) clickClear();
             if (clearText === 1) displayNumber = "0";
@@ -78,7 +43,7 @@ function clickButton(origin, inputVal, inputTxt) {
                 if (clearText === 2) (userA = displayNumber);
             } else if (!clearText && userOp) {
                 origin = "opExists";
-                displayNumber = calculate(userA, userB, userOp);
+                displayNumber = calculate(Number(userA), Number(userB), userOp).toString();
                 userA = displayNumber;
             } else {
                 return; // multiple operators in a row get returned
@@ -88,7 +53,7 @@ function clickButton(origin, inputVal, inputTxt) {
             userOp = inputVal;
             displayOp = inputTxt;
             clearText = 1;
-            // displayNumber = "";
+            displayNumber = "0";
             break;
         case "backspace":
             if (clearText === 2) {
@@ -96,14 +61,14 @@ function clickButton(origin, inputVal, inputTxt) {
             } else {
                 displayNumber = "0";
                 if (!userOp) {
-                    userA = 0;
+                    userA = "0";
                 } else {
-                    userB = 0;
+                    userB = "0";
                 }
             }
             break;
         case "negative":
-            if (displayNumber === 0) {
+            if (Number(displayNumber) === 0) {
                 return;
             } else {
                 displayNumber = negative(displayNumber);
@@ -118,30 +83,25 @@ function clickButton(origin, inputVal, inputTxt) {
             if (!userOp) {return};
             if (clearText === 1) userB = displayNumber;
             if (clearText === 2) userA = displayNumber;
-            displayNumber = calculate(userA, userB, userOp);
+            displayNumber = calculate(Number(userA), Number(userB), userOp).toString();
             clearText = 2;
             break;
         default:
             origin = "error"
     }
     // after button clicking is resolved and variables are set, sends data to update the display screen
-    if (lengthCheck(displayNumber)) displayNumber = displayNumber.slice(0, -1);
+    if (Number(displayNumber) > 999999999999999 || Number(userA) > 999999999999999 || Number(userB) > 999999999999999 ||
+        Number(displayNumber) < -999999999999999 || Number(userA) < -999999999999999 || Number(userB) < -999999999999999) origin = "overflow";
     updateDisplay(origin, inputTxt, userA, userB, displayNumber);
 }
 
 function updateDisplay(origin, inputTxt, a, b, dn) {
     const displayElement = document.querySelector('#display');
     const historyElement = document.querySelector('#history');
-
-    // take the userA (a) userB (b) and displayNumber (dn) from the arguments and check length of each
+    // adding commas to the displayNumber, and userA and B strings
     Array.from(arguments).forEach((item, index) => {
         if (index > 1) {
-            if (Number(arguments[index]) >= Number.MAX_SAFE_INTEGER) {
-                arguments[index] = BigInt(Math.round(item));
-            } else {
-                arguments[index] = Number(item);
-            }
-            if (arguments[index].toLocaleString('en-US', {maximumFractionDigits: 20}).length > 19) convertExponential(arguments[index]);
+            arguments[index] = addCommas(arguments[index]);
         }
     });
     // clearText is a flag variable. 0 = do nothing, 1 = clear display div, 2 = reset calc
@@ -149,8 +109,7 @@ function updateDisplay(origin, inputTxt, a, b, dn) {
     switch (origin) {
         case "mouseclick":
         case "keypress":
-            displayElement.textContent = dn.toLocaleString('en-US', {maximumFractionDigits: 20});
-            if (displayNumber.endsWith(".")) displayElement.textContent += ".";
+            displayElement.textContent = dn;
             break;
         case "opExists":
             // multiple operands calculate the current expression and add the new operator
@@ -162,7 +121,7 @@ function updateDisplay(origin, inputTxt, a, b, dn) {
         case "equals":
             // equal sign shows entire equation with the solution in the display
             historyElement.textContent = `${a} ${displayOp} ${b} =`;
-            displayElement.textContent = displayNumber;
+            displayElement.textContent = dn;
             break;
         case "overflow":
             historyElement.textContent = "";
@@ -177,52 +136,53 @@ function updateDisplay(origin, inputTxt, a, b, dn) {
         default:
             displayElement.textContent = "error";
     }
-
-    // displayElement.textContent = displayNumber.toLocaleString('en-US', {maximumFractionDigits: 15});
-    // // after everything is resolved, checks to see if it fits on calculator screen
-    // if (displayElement.textContent.length > 15) {
-    //     displayElement.textContent = convertExponential(displayNumber);
-    // } else {
-        
-    // }
-
-test(a, b);
 }
 
-function clickClear() {
-    userOp = null;
-    userA = 0;
-    userB = 0;
-    displayNumber = "0";
-    clearText = 1;
-    updateDisplay("clear");
+function lengthCheck(str) {
+    // all the stupid length tests to prevent the variable from getting too large to become a number
+    let convNum = Number(str).toLocaleString('en-us', {maximumFractionDigits: 20})
+    if (convNum.indexOf('.') > -1) {
+        if (Number(str).toString().length > 16) return false;
+    }
+    if (convNum.length >= 19) {
+        return false;
+    }
+    return true;
 }
 
-function convertExponential(num) {
-    // any excess length is removed from the max length of the scientific notation
-    let length = num.toLocaleString('en-US', {notation: 'scientific', maximumFractionDigits: 15}).length
-    let over = ((length - 19) > 0) ? (length - 15) : 0;
-    return num.toLocaleString('en-US', {notation: 'scientific', maximumFractionDigits: 15-over});
+function addCommas(str) {
+    if (str.indexOf('.') > -1) {
+        return (Number(str.slice(0, str.indexOf('.'))).toLocaleString('en-us', {maximumFractionDigits: 20})) + (str.slice(str.indexOf('.')));
+    } else {
+        return Number(str).toLocaleString('en-us', {maximumFractionDigits: 20});
+    }
 }
 
-function negative(num) {
-    if (num > 0) {
-        return -Math.abs(num);
-    } else if (num < 0) {
-        return Math.abs(num);
+function round(value, decimals) {
+    return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
+
+function negative(str) {
+    if (str > 0) {
+        return -Math.abs(str);
+    } else if (str < 0) {
+        return Math.abs(str);
     } else {
         updateDisplay("error");
     }
 }
 
-function lengthCheck(str) {
-    // all the stupid length tests to prevent the variable from getting too large to become a number
-    return Number(str).toLocaleString('en-US', {maximumFractionDigits: 20}).length > 18 ||
-        (str.slice(str.indexOf(".")).length > 16)
+function removeComma(str) {
+    return str.replace(',', '');
 }
 
-function round(value, decimals) {
-    return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+function clickClear() {
+    userOp = null;
+    userA = "0";
+    userB = "0";
+    displayNumber = "0";
+    clearText = 1;
+    updateDisplay("clear");
 }
 
 
