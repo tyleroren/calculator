@@ -90,8 +90,8 @@ function clickButton(origin, inputVal, inputTxt) {
         default:
             origin = "error"
     }
-    [displayNumber, userA, userB].forEach((n) => {
-        if (lengthCheck(n) > 19) origin = "overflow";
+    [displayNumber, userA, userB].forEach((e) => {
+        if (lengthCheck(e) > 19) origin = "overflow";
     });
     updateDisplay(origin, inputTxt, userA, userB, displayNumber);
 }
@@ -174,7 +174,6 @@ function clickClear() {
     clearText = 1;
     updateDisplay("clear");
 }
-
 
 // button listeners, calls the corresponding function and passes event data through
 document.querySelectorAll('.number').forEach((item) => item.addEventListener('click', (e) => {
