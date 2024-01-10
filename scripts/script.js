@@ -21,10 +21,11 @@ function calculate(a, b, op) {
 }
 
 function clickButton(origin, inputVal, inputTxt) {
+    // clearText is a flag variable. 0 = do nothing, 1 = clear display div, 2 = reset calc
     switch (origin) {
         case "mouseclick":
         case "keypress": // mouseclick or keypress on a number button
-            if (!lengthCheck(displayNumber)) return;
+            if (lengthCheck(displayNumber) >= 19) return;
             if (inputTxt === "." && (displayNumber.includes('.') || typeof displayNumber == "bigint")) inputTxt = ""; // only lets you put one decimal
             if (clearText === 2) clickClear();
             if (clearText === 1) displayNumber = "0";
@@ -71,7 +72,7 @@ function clickButton(origin, inputVal, inputTxt) {
             if (Number(displayNumber) === 0) {
                 return;
             } else {
-                displayNumber = negative(displayNumber);
+                displayNumber = negative(Number(displayNumber)).toString();
             }
             if (!userOp) { // updates user variable depending on if an operand is clicked yet
                 userA = displayNumber;
@@ -89,9 +90,9 @@ function clickButton(origin, inputVal, inputTxt) {
         default:
             origin = "error"
     }
-    // after button clicking is resolved and variables are set, sends data to update the display screen
-    if (Number(displayNumber) > 999999999999999 || Number(userA) > 999999999999999 || Number(userB) > 999999999999999 ||
-        Number(displayNumber) < -999999999999999 || Number(userA) < -999999999999999 || Number(userB) < -999999999999999) origin = "overflow";
+    [displayNumber, userA, userB].forEach((n) => {
+        if (lengthCheck(n) > 19) origin = "overflow";
+    });
     updateDisplay(origin, inputTxt, userA, userB, displayNumber);
 }
 
@@ -104,11 +105,11 @@ function updateDisplay(origin, inputTxt, a, b, dn) {
             arguments[index] = addCommas(arguments[index]);
         }
     });
-    // clearText is a flag variable. 0 = do nothing, 1 = clear display div, 2 = reset calc
     // updates display depending on the origin of the function call
     switch (origin) {
         case "mouseclick":
         case "keypress":
+        case "negative":
             displayElement.textContent = dn;
             break;
         case "opExists":
@@ -139,15 +140,12 @@ function updateDisplay(origin, inputTxt, a, b, dn) {
 }
 
 function lengthCheck(str) {
-    // all the stupid length tests to prevent the variable from getting too large to become a number
-    let convNum = Number(str).toLocaleString('en-us', {maximumFractionDigits: 20})
-    if (convNum.indexOf('.') > -1) {
-        if (Number(str).toString().length > 16) return false;
+    let convNum = Math.abs(Number(str)).toLocaleString('en-us', {maximumFractionDigits: 20});
+    if ((Number(str).toString().indexOf('.') > -1) && (Number(str).toString().length > 16)) {
+        return 19;
+    } else {
+        return convNum.length;
     }
-    if (convNum.length >= 19) {
-        return false;
-    }
-    return true;
 }
 
 function addCommas(str) {
@@ -158,22 +156,15 @@ function addCommas(str) {
     }
 }
 
-function round(value, decimals) {
-    return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
-}
-
-function negative(str) {
-    if (str > 0) {
-        return -Math.abs(str);
-    } else if (str < 0) {
-        return Math.abs(str);
+function negative(num) {
+    console.log(num);
+    if (num > 0) {
+        return -Math.abs(num);
+    } else if (num < 0) {
+        return Math.abs(num);
     } else {
         updateDisplay("error");
     }
-}
-
-function removeComma(str) {
-    return str.replace(',', '');
 }
 
 function clickClear() {
