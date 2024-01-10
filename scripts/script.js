@@ -157,7 +157,6 @@ function addCommas(str) {
 }
 
 function negative(num) {
-    console.log(num);
     if (num > 0) {
         return -Math.abs(num);
     } else if (num < 0) {
